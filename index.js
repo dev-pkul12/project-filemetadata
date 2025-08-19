@@ -1,20 +1,45 @@
-var express = require('express');
-var cors = require('cors');
-require('dotenv').config()
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const multer = require('multer');
 
-var app = express();
+const app = express();
 
 app.use(cors());
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function (req, res) {
-  res.sendFile(process.cwd() + '/views/index.html');
+// Serve index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+/**
+ * Multer Setup
+ * You can use memoryStorage (no file saved) OR diskStorage (saves in /uploads).
+ */
 
+// ✅ Option 1: Memory storage (preferred for FCC project)
+const storage = multer.memoryStorage();
 
+const upload = multer({ storage: storage });
 
-const port = process.env.PORT || 3000;
-app.listen(port, function () {
-  console.log('Your app is listening on port ' + port)
+// API endpoint
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  res.json({
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size
+  });
 });
+
+module.exports = app;
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+}
