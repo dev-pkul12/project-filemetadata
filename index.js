@@ -1,17 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const multer = require('multer');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const multer = require("multer");
 
 const app = express();
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Serve index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
 /**
@@ -25,15 +25,15 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // API endpoint
-app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
+    return res.status(400).json({ error: "No file uploaded" });
   }
 
   res.json({
     name: req.file.originalname,
     type: req.file.mimetype,
-    size: req.file.size
+    size: req.file.size,
   });
 });
 
